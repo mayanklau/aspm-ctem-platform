@@ -72,7 +72,7 @@
       </div>
       <div *ngFor="let k of objectKeys(selected)">
         <div *ngIf="selected[k]!==null&&selected[k]!==''&&k!=='raw_data'&&k!=='id'&&k!=='ingestion_id'" class="field-group">
-          <div class="field-label">{{k.replace(/_/g,' ')}}</div><div class="field-value">{{selected[k]}}</div>
+          <div class="field-label">{{k.split('_').join(' ')}}</div><div class="field-value">{{selected[k]}}</div>
         </div>
       </div>
     </div>

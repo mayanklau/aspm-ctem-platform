@@ -25,7 +25,7 @@
       <div class="card h-100">
         <div class="card-header"><i class="fa fa-chart-pie me-1 text-primary"></i>Finding Distribution</div>
         <div class="card-body"><app-chart type="doughnut" [labels]="sevChartLabels" [datasets]="sevChartDatasets" [height]="160"
-          [options]="{{plugins:{legend:{position:'right'}}}}"></app-chart></div>
+          [options]="{plugins:{legend:{position:'right'}}}"></app-chart></div>
       </div>
     </div>
   </div>
@@ -126,7 +126,7 @@
       </div>
       <div *ngFor="let k of objectKeys(selected)">
         <div *ngIf="selected[k]!==null && selected[k]!=='' && k!=='raw_data' && k!=='id' && k!=='ingestion_id'" class="field-group">
-          <div class="field-label">{{k.replace(/_/g,' ')}}</div>
+          <div class="field-label">{{k.split('_').join(' ')}}</div>
           <div class="field-value">{{selected[k]}}</div>
         </div>
       </div>

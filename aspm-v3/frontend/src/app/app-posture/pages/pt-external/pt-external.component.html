@@ -8,7 +8,7 @@
   </div>
   <div class="row g-3 mb-4" *ngIf="summary.length">
     <div class="col-md-6"><div class="card h-100"><div class="card-header"><i class="fa fa-chart-bar me-1 text-warning"></i>Severity Breakdown</div><div class="card-body"><app-sev-bars [summary]="summary"></app-sev-bars></div></div></div>
-    <div class="col-md-6"><div class="card h-100"><div class="card-header"><i class="fa fa-chart-pie me-1 text-primary"></i>Distribution</div><div class="card-body"><app-chart type="doughnut" [labels]="sevLabels" [datasets]="sevDatasets" [height]="160" [options]="{{plugins:{legend:{position:'right'}}}}"></app-chart></div></div></div>
+    <div class="col-md-6"><div class="card h-100"><div class="card-header"><i class="fa fa-chart-pie me-1 text-primary"></i>Distribution</div><div class="card-body"><app-chart type="doughnut" [labels]="sevLabels" [datasets]="sevDatasets" [height]="160" [options]="{plugins:{legend:{position:'right'}}}"></app-chart></div></div></div>
   </div>
   <div class="card mb-3"><div class="card-body py-2"><div class="row g-2">
     <div class="col-md-2"><input class="form-control form-control-sm" [(ngModel)]="filters.appId" placeholder="App ID..." (keyup.enter)="apply()"></div>
@@ -52,7 +52,7 @@
       </div>
       <div *ngFor="let k of objectKeys(selected)">
         <div *ngIf="selected[k]!==null&&selected[k]!==''&&k!=='raw_data'&&k!=='id'&&k!=='ingestion_id'" class="field-group">
-          <div class="field-label">{{k.replace(/_/g,' ')}}</div><div class="field-value">{{selected[k]}}</div>
+          <div class="field-label">{{k.split('_').join(' ')}}</div><div class="field-value">{{selected[k]}}</div>
         </div>
       </div>
     </div>
