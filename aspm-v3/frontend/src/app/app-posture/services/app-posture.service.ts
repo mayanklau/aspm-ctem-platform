@@ -65,7 +65,7 @@ export class AppPostureService {
   deleteIntegration(id: string): Observable<any> { return this.http.delete(`${this.base}/integrations/${id}`); }
   triggerSync(id: string): Observable<any> { return this.http.post(`${this.base}/integrations/${id}/sync`, {}); }
   testConnection(d: any): Observable<any> { return this.http.post(`${this.base}/integrations/test-connection`, d); }
-}
   getScoreTrend(appId: string, months = 12): Observable<any> {
     return this.http.get<any>(`${this.base}/scores/application/${appId}/trend`, { params: this.p({ months }) }).pipe(map(r => r.data ?? r));
   }
+}

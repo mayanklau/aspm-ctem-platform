@@ -120,7 +120,7 @@
       <button class="btn btn-sm btn-outline-secondary" (click)="close()"><i class="fa fa-times"></i></button>
     </div>
     <div class="side-panel-body" *ngIf="selected">
-      <div class="mb-3 p-3 rounded-3" [ngStyle]{{'background': 'var(--bs-'+( selected.severity==='critical'?'danger':selected.severity==='high'?'warning':'success')+'-bg, #f8f9fa)'}}">
+      <div class="mb-3 p-3 rounded-3" [ngStyle]="{'background': 'var(--bs-'+( selected.severity==='critical'?'danger':selected.severity==='high'?'warning':'success')+'-bg, #f8f9fa)'}">
         <span [ngClass]="sevClass(selected.severity)">{{selected.severity | titlecase}}</span>
         <div class="fw-bold mt-2">{{selected.title||selected.finding_title||selected.observation_title||selected.sig_name}}</div>
       </div>

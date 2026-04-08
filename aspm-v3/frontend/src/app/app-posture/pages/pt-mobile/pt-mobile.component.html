@@ -1,0 +1,60 @@
+<div>
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-2">
+      <a routerLink="/app-posture" class="btn btn-sm btn-outline-secondary"><i class="fa fa-arrow-left"></i></a>
+      <div><div class="page-title">PT Mobile Findings</div><div class="text-muted small">Mobile Application Security Testing</div></div>
+    </div>
+    <span class="badge bg-secondary rounded-pill">{{total}} findings</span>
+  </div>
+  <div class="row g-3 mb-4" *ngIf="summary.length">
+    <div class="col-md-6"><div class="card h-100"><div class="card-header"><i class="fa fa-chart-bar me-1 text-warning"></i>Severity Breakdown</div><div class="card-body"><app-sev-bars [summary]="summary"></app-sev-bars></div></div></div>
+    <div class="col-md-6"><div class="card h-100"><div class="card-header"><i class="fa fa-chart-pie me-1 text-primary"></i>Distribution</div><div class="card-body"><app-chart type="doughnut" [labels]="sevLabels" [datasets]="sevDatasets" [height]="160" [options]="{{plugins:{legend:{position:'right'}}}}"></app-chart></div></div></div>
+  </div>
+  <div class="card mb-3"><div class="card-body py-2"><div class="row g-2">
+    <div class="col-md-2"><input class="form-control form-control-sm" [(ngModel)]="filters.appId" placeholder="App ID..." (keyup.enter)="apply()"></div>
+    <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.severity" (change)="apply()"><option value="">All Severity</option><option *ngFor="let s of severities" [value]="s">{{s|titlecase}}</option></select></div>
+    <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.status" (change)="apply()"><option value="">All Status</option><option *ngFor="let s of statuses" [value]="s">{{s}}</option></select></div>
+    <div class="col-md-3"><input class="form-control form-control-sm" [(ngModel)]="filters.q" placeholder="Search..." (keyup.enter)="apply()"></div>
+    <div class="col-md-3"><button class="btn btn-sm btn-primary me-1" (click)="apply()">Filter</button><button class="btn btn-sm btn-outline-secondary" (click)="clear()">Clear</button></div>
+  </div></div></div>
+  <div class="card"><div class="card-body p-0"><div class="table-responsive">
+    <table class="table data-table mb-0">
+      <thead><tr><th>Finding</th><th>App</th><th>OWASP</th><th>CVSS</th><th>Severity</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr *ngIf="loading"><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary spinner-border-sm"></div></td></tr>
+        <tr *ngFor="let f of findings" class="clickable" (click)="open(f)" [class.row-critical]="f.severity==='critical'" [class.row-high]="f.severity==='high'">
+          <td><div class="fw-bold small" style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" [title]="f.finding_title">{{f.finding_title}}</div><div class="text-muted" style="font-size:.7rem">{{f.cwe_id?'CWE-'+f.cwe_id:''}}</div></td>
+          <td class="small text-muted">{{f.app_id}}</td>
+          <td class="small text-muted">{{f.owasp_category||f.owasp_mobile_cat||'—'}}</td>
+          <td><strong [ngClass]="(f.cvss_score||0)>=9?'text-danger':(f.cvss_score||0)>=7?'text-warning':''">{{f.cvss_score||'—'}}</strong></td>
+          <td><span [ngClass]="sevClass(f.severity)">{{f.severity}}</span></td>
+          <td><select class="form-select form-select-sm" style="width:110px;font-size:.75rem" [(ngModel)]="f.status" (change)="updateStatus(f.id,f.status)" (click)="$event.stopPropagation()"><option *ngFor="let s of statuses" [value]="s">{{s}}</option></select></td>
+        </tr>
+        <tr *ngIf="!loading&&!findings.length"><td colspan="6" class="text-center py-5"><i class="fa fa-inbox fa-2x text-muted mb-2 d-block"></i><div class="small text-muted">No findings. Upload PT CSV.</div></td></tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top" *ngIf="total>limit">
+      <div class="small text-muted">Page {{page}} / {{pages}}</div>
+      <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="page<=1" (click)="page=page-1;load()"><i class="fa fa-chevron-left"></i></button>
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="page>=pages" (click)="page=page+1;load()"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div></div></div>
+  <div class="side-overlay" *ngIf="showPanel" (click)="close()"></div>
+  <div class="side-panel" *ngIf="showPanel">
+    <div class="side-panel-header"><h6 class="mb-0">PT Finding Detail</h6><button class="btn btn-sm btn-outline-secondary" (click)="close()"><i class="fa fa-times"></i></button></div>
+    <div class="side-panel-body" *ngIf="selected">
+      <div class="mb-3 p-3 rounded-3" [ngStyle]="{'background': 'var(--bs-'+( selected.severity==='critical'?'danger':selected.severity==='high'?'warning':'success')+'-bg, #f8f9fa)'}">
+        <span [ngClass]="sevClass(selected.severity)">{{selected.severity|titlecase}}</span>
+        <div class="fw-bold mt-2">{{selected.finding_title}}</div>
+        <div class="small text-muted mt-1">CVSS: {{selected.cvss_score||'N/A'}} · {{selected.owasp_category||selected.owasp_mobile_cat||''}}</div>
+      </div>
+      <div *ngFor="let k of objectKeys(selected)">
+        <div *ngIf="selected[k]!==null&&selected[k]!==''&&k!=='raw_data'&&k!=='id'&&k!=='ingestion_id'" class="field-group">
+          <div class="field-label">{{k.replace(/_/g,' ')}}</div><div class="field-value">{{selected[k]}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

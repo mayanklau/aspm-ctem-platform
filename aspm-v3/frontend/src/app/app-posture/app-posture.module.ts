@@ -15,13 +15,13 @@ import { FirewallDetailComponent } from './pages/firewall/firewall-detail.compon
 import { WafDetailComponent }      from './pages/waf/waf-detail.component';
 import { IpsDetailComponent }      from './pages/ips/ips-detail.component';
 import { SiemDetailComponent }     from './pages/siem/siem-detail.component';
-import { PtExternalComponent }     from './pages/pt-external/ptexternal.component';
-import { PtInternalComponent }     from './pages/pt-internal/ptinternal.component';
-import { PtMobileComponent }       from './pages/pt-mobile/ptmobile.component';
+import { PtExternalComponent }     from './pages/pt-external/pt-external.component';
+import { PtInternalComponent }     from './pages/pt-internal/pt-internal.component';
+import { PtMobileComponent }       from './pages/pt-mobile/pt-mobile.component';
 import { RedteamDetailComponent }  from './pages/redteam/redteam-detail.component';
 import { AuditDetailComponent }    from './pages/audit/audit-detail.component';
-import { OsComplianceComponent }   from './pages/os-compliance/oscompliance.component';
-import { DbComplianceComponent }   from './pages/db-compliance/dbcompliance.component';
+import { OsComplianceComponent }   from './pages/os-compliance/os-compliance.component';
+import { DbComplianceComponent }   from './pages/db-compliance/db-compliance.component';
 import { IngestionComponent }      from './pages/ingestion/ingestion.component';
 import { IntegrationsComponent }   from './pages/integrations/integrations.component';
 import { ScoreAdminComponent }     from './pages/score-admin/score-admin.component';
@@ -32,6 +32,7 @@ import { DonutComponent }     from './components/donut/donut.component';
 import { ChartComponent }     from './components/chart/chart.component';
 import { SeverityBadgeComponent } from './components/severity-badge/severity-badge.component';
 import { PostureGaugeComponent }  from './components/posture-gauge/posture-gauge.component';
+import { FindingTableComponent }  from './components/finding-table/finding-table.component';
 
 import { SumByPipe } from './pipes/sum-by.pipe';
 import { AvgByPipe } from './pipes/avg-by.pipe';
@@ -48,7 +49,7 @@ import { AppPostureCxoWidgetsComponent } from '../cxo-dashboard/widgets/app-post
     OsComplianceComponent, DbComplianceComponent, IngestionComponent,
     IntegrationsComponent, ScoreAdminComponent,
     GaugeComponent, SevBarsComponent, DonutComponent, ChartComponent,
-    SeverityBadgeComponent, PostureGaugeComponent,
+    SeverityBadgeComponent, PostureGaugeComponent, FindingTableComponent,
     SumByPipe, AvgByPipe, MinPipe,
     AppPostureCxoWidgetsComponent
   ],
