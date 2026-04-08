@@ -1,0 +1,26 @@
+<div class="report-detail-page">
+  <div class="page-header d-flex justify-content-between align-items-center mb-3">
+    <div><a class="btn btn-sm btn-outline-secondary mr-2" routerLink="/app-posture"><i class="fa fa-arrow-left"></i></a><h2 class="page-title d-inline">Compliance Findings</h2></div>
+    <span class="badge badge-secondary">{{total}} records</span>
+  </div>
+  <div class="btn-group mb-3">
+    <button class="btn btn-sm" [ngClass]="filters.compType==='os'?'btn-primary':'btn-outline-secondary'" (click)="setType('os')">OS Compliance</button>
+    <button class="btn btn-sm" [ngClass]="filters.compType==='db'?'btn-primary':'btn-outline-secondary'" (click)="setType('db')">DB Compliance</button>
+  </div>
+  <div class="card filter-card mb-3"><div class="card-body py-2">
+    <div class="row">
+      <div class="col-md-2"><select class="form-control form-control-sm" [(ngModel)]="filters.complianceStatus" (change)="onFilter()"><option value="">All Status</option><option value="fail">Fail</option><option value="pass">Pass</option><option value="not_applicable">N/A</option></select></div>
+      <div class="col-md-2"><select class="form-control form-control-sm" [(ngModel)]="filters.severity" (change)="onFilter()"><option value="">All Severity</option><option *ngFor="let s of ['critical','high','medium','low']" [value]="s">{{s|titlecase}}</option></select></div>
+      <div class="col-md-3"><input class="form-control form-control-sm" [(ngModel)]="filters.assetId" placeholder="Asset ID / hostname..." (keyup.enter)="onFilter()"></div>
+      <div class="col-md-2"><button class="btn btn-sm btn-primary mr-1" (click)="onFilter()">Filter</button><button class="btn btn-sm btn-outline-secondary" (click)="onClear()">Clear</button></div>
+    </div>
+  </div></div>
+  <div class="card"><div class="card-body p-0">
+    <app-finding-table [findings]="findings" [total]="total" [page]="page" [limit]="limit" [loading]="loading" [columns]="columns" (rowClick)="onRow($event)" (pageChange)="onPage($event)" (statusChange)="onStatus($event)"></app-finding-table>
+  </div></div>
+  <div class="side-panel-overlay" *ngIf="showPanel" (click)="showPanel=false"></div>
+  <div class="side-panel" [class.open]="showPanel" *ngIf="selected">
+    <div class="side-panel-header"><strong>{{selected.control_id}} — {{selected.hostname||selected.db_hostname}}</strong><button class="btn btn-sm" (click)="showPanel=false"><i class="fa fa-times"></i></button></div>
+    <div class="side-panel-body"><div *ngFor="let k of objectKeys(selected)" class="field-row"><div class="field-label">{{k}}</div><div class="field-value small">{{selected[k]}}</div></div></div>
+  </div>
+</div>

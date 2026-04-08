@@ -1,0 +1,140 @@
+/* ═══════════════════════════════════════════════════════
+   ASPM/CTEM Platform — Global Styles v3
+   EY AI for Cyber | Inter font throughout
+   ═══════════════════════════════════════════════════════ */
+
+* { font-family: 'Inter', 'Segoe UI', sans-serif; }
+
+:root {
+  --ey-yellow: #FFE600;
+  --ey-dark:   #1A1A24;
+  --blue:      #2E5BFF;
+  --blue-light:#EBF0FF;
+  --red:       #E53935;
+  --amber:     #FB8C00;
+  --green:     #2E7D32;
+  --gray-bg:   #F5F6FA;
+  --card-shadow: 0 2px 12px rgba(0,0,0,.07);
+}
+
+body { background: var(--gray-bg); color: #1a1a24; }
+
+/* ── Typography ─────────────────────────────────────── */
+.page-title   { font-size:1.5rem; font-weight:800; color:var(--ey-dark); letter-spacing:-.3px; }
+.section-title{ font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#888; }
+
+/* ── Cards ──────────────────────────────────────────── */
+.card { border:none; border-radius:14px; box-shadow:var(--card-shadow); }
+.card-header { background:#fff; font-weight:700; font-size:.85rem; border-bottom:1px solid #f0f0f0; border-radius:14px 14px 0 0 !important; padding:14px 18px; }
+.card-body    { padding:16px 18px; }
+
+/* ── Score Tiles ─────────────────────────────────────── */
+.score-tile {
+  background:#fff; border-radius:14px; padding:20px 18px;
+  box-shadow:var(--card-shadow); position:relative; overflow:hidden;
+  transition:transform .15s,box-shadow .15s;
+}
+.score-tile:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.12); }
+.score-tile::before { content:''; position:absolute; top:0;left:0;right:0;height:4px; }
+.score-tile.red::before   { background:linear-gradient(90deg,#e53935,#ff7043); }
+.score-tile.amber::before { background:linear-gradient(90deg,#fb8c00,#fdd835); }
+.score-tile.green::before { background:linear-gradient(90deg,#2e7d32,#66bb6a); }
+.score-tile.blue::before  { background:linear-gradient(90deg,#2e5bff,#00bcd4); }
+.score-tile .value { font-size:2.6rem; font-weight:800; line-height:1; }
+.score-tile .label { font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:#888; margin-top:4px; }
+.score-tile .sub   { font-size:.7rem; color:#aaa; margin-top:2px; }
+.score-tile .trend { font-size:.72rem; margin-top:8px; }
+
+/* ── Gauge (CSS ring) ────────────────────────────────── */
+.gauge-wrap { position:relative; display:inline-flex; align-items:center; justify-content:center; }
+.gauge-ring  { transform:rotate(-90deg); }
+.gauge-bg    { fill:none; stroke:#f0f0f0; }
+.gauge-fill  { fill:none; stroke-linecap:round; transition:stroke-dashoffset .6s ease; }
+.gauge-text  { position:absolute; text-align:center; }
+.gauge-text .gv { font-size:1.5rem; font-weight:800; line-height:1; }
+.gauge-text .gl { font-size:.6rem; text-transform:uppercase; color:#999; letter-spacing:.4px; }
+
+/* ── Charts ─────────────────────────────────────────── */
+.chart-container { position:relative; }
+
+/* ── Severity Pills ──────────────────────────────────── */
+.sev-critical { background:#fdecea; color:#c62828; border:1px solid #ef9a9a; }
+.sev-high     { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; }
+.sev-medium   { background:#fffde7; color:#f57f17; border:1px solid #fff176; }
+.sev-low      { background:#e8f5e9; color:#1b5e20; border:1px solid #a5d6a7; }
+.sev-info     { background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; }
+.sev-pill     { font-size:.69rem; font-weight:700; padding:3px 9px; border-radius:20px; }
+
+/* ── Tables ──────────────────────────────────────────── */
+.data-table th { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:#666; background:#fafbfc; border-bottom:2px solid #eee; }
+.data-table td { font-size:.82rem; vertical-align:middle; border-color:#f5f5f5; }
+.data-table tbody tr { transition:background .1s; cursor:pointer; }
+.data-table tbody tr:hover { background:#f8f9ff !important; }
+.row-critical { background:#fff8f8 !important; }
+.row-high     { background:#fffbf4 !important; }
+
+/* ── Severity Bar (inline) ───────────────────────────── */
+.sev-bar-row  { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.sev-bar-label{ width:70px; font-size:.75rem; font-weight:600; }
+.sev-bar-track{ flex:1; height:10px; background:#f0f0f0; border-radius:5px; overflow:hidden; }
+.sev-bar-fill { height:100%; border-radius:5px; transition:width .5s ease; }
+.sev-bar-count{ width:30px; font-size:.75rem; font-weight:700; text-align:right; }
+
+/* ── BU Heatmap Grid ─────────────────────────────────── */
+.bu-grid      { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:8px; }
+.bu-cell      { border-radius:10px; padding:10px; text-align:center; transition:transform .15s; cursor:pointer; }
+.bu-cell:hover{ transform:scale(1.04); }
+.bu-cell .bv  { font-size:1.4rem; font-weight:800; }
+.bu-cell .bn  { font-size:.65rem; font-weight:600; margin-top:2px; text-transform:uppercase; letter-spacing:.3px; }
+.bu-cell .bc  { font-size:.6rem; color:#666; }
+
+/* ── Nav quick cards ─────────────────────────────────── */
+.nav-card     { border-radius:12px; padding:14px; text-align:center; background:#fff; box-shadow:var(--card-shadow); transition:transform .15s,box-shadow .15s; cursor:pointer; text-decoration:none; }
+.nav-card:hover{ transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.12); }
+.nav-card .ni { font-size:1.4rem; margin-bottom:6px; }
+.nav-card .nl { font-size:.72rem; font-weight:700; color:#333; }
+
+/* ── Side panel ──────────────────────────────────────── */
+.side-overlay { position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1040; }
+.side-panel   { position:fixed;right:0;top:0;width:480px;height:100vh;background:#fff;z-index:1050;overflow-y:auto;box-shadow:-8px 0 32px rgba(0,0,0,.15); }
+.side-panel-header{ padding:18px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center; }
+.side-panel-body  { padding:20px; }
+.field-group  { margin-bottom:14px; }
+.field-label  { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#999; margin-bottom:2px; }
+.field-value  { font-size:.85rem; color:#1a1a24; word-break:break-word; }
+
+/* ── Upload dropzone ─────────────────────────────────── */
+.dropzone { border:2px dashed #d0d8ff; border-radius:12px; padding:28px; text-align:center; cursor:pointer; transition:all .2s; background:#fafbff; }
+.dropzone:hover { border-color:var(--blue); background:#f0f4ff; }
+.dropzone.active{ border-color:#2e7d32; background:#f0fdf4; }
+
+/* ── Misc ────────────────────────────────────────────── */
+.skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+.badge-critical{ background:#fdecea;color:#c62828; }
+.badge-high    { background:#fff3e0;color:#e65100; }
+.badge-medium  { background:#fffde7;color:#f57f17; }
+.badge-low     { background:#e8f5e9;color:#1b5e20; }
+.badge-info    { background:#e3f2fd;color:#0d47a1; }
+.risk-badge    { font-size:.69rem;font-weight:700;padding:3px 9px;border-radius:20px; }
+.export-btn    { font-size:.75rem; }
+.clickable     { cursor:pointer; }
+.text-ey       { color:var(--ey-dark); }
+.bg-ey         { background:var(--ey-dark); color:var(--ey-yellow); }
+
+/* ── Sidebar layout ──────────────────────────────────── */
+.app-layout    { display:flex; min-height:100vh; }
+.sidebar       { width:220px; background:var(--ey-dark); flex-shrink:0; position:fixed; top:0;left:0;bottom:0;overflow-y:auto; z-index:100; }
+.sidebar-logo  { padding:20px 18px 16px; border-bottom:1px solid rgba(255,255,255,.08); }
+.sidebar-logo .logo-ey  { font-size:1.6rem;font-weight:900;color:var(--ey-yellow);letter-spacing:-1px; }
+.sidebar-logo .logo-sub { font-size:.62rem;color:#aaa;letter-spacing:.5px;text-transform:uppercase; }
+.sidebar-nav   { padding:12px 0; }
+.sidebar-section{ font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#555;padding:12px 18px 4px; }
+.nav-item      { display:flex;align-items:center;gap:10px;padding:8px 18px;color:#ccc;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none; }
+.nav-item:hover{ background:rgba(255,255,255,.06);color:#fff; }
+.nav-item.active{ background:rgba(255,230,0,.1);color:var(--ey-yellow);border-right:3px solid var(--ey-yellow); }
+.nav-item i    { width:16px;text-align:center;font-size:.8rem; }
+.main-content  { margin-left:220px;flex:1;padding:24px 28px;max-width:calc(100vw - 220px); }
+.top-bar       { background:#fff;border-radius:14px;padding:12px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--card-shadow); }
+
+@media(max-width:768px){ .sidebar{display:none} .main-content{margin-left:0;max-width:100vw} }

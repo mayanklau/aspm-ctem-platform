@@ -1,0 +1,27 @@
+<div class="report-detail-page">
+  <div class="page-header d-flex justify-content-between align-items-center mb-3">
+    <div><a class="btn btn-sm btn-outline-secondary mr-2" routerLink="/app-posture"><i class="fa fa-arrow-left"></i></a><h2 class="page-title d-inline">Penetration Testing</h2></div>
+    <span class="badge badge-secondary">{{total}} findings</span>
+  </div>
+  <div class="btn-group mb-3">
+    <button class="btn btn-sm" [ngClass]="filters.ptType==='external_webapp'?'btn-primary':'btn-outline-secondary'" (click)="setType('external_webapp')">External Web App</button>
+    <button class="btn btn-sm" [ngClass]="filters.ptType==='internal_webapp'?'btn-primary':'btn-outline-secondary'" (click)="setType('internal_webapp')">Internal Web App</button>
+    <button class="btn btn-sm" [ngClass]="filters.ptType==='mobile'?'btn-primary':'btn-outline-secondary'" (click)="setType('mobile')">Mobile</button>
+  </div>
+  <div class="card filter-card mb-3"><div class="card-body py-2">
+    <div class="row">
+      <div class="col-md-2"><select class="form-control form-control-sm" [(ngModel)]="filters.severity" (change)="onFilter()"><option value="">All Severity</option><option *ngFor="let s of ['critical','high','medium','low']" [value]="s">{{s|titlecase}}</option></select></div>
+      <div class="col-md-2"><select class="form-control form-control-sm" [(ngModel)]="filters.status" (change)="onFilter()"><option value="">All Status</option><option value="open">Open</option><option value="resolved">Resolved</option></select></div>
+      <div class="col-md-3"><input class="form-control form-control-sm" [(ngModel)]="filters.appId" placeholder="App ID..." (keyup.enter)="onFilter()"></div>
+      <div class="col-md-2"><button class="btn btn-sm btn-primary mr-1" (click)="onFilter()">Filter</button><button class="btn btn-sm btn-outline-secondary" (click)="onClear()">Clear</button></div>
+    </div>
+  </div></div>
+  <div class="card"><div class="card-body p-0">
+    <app-finding-table [findings]="findings" [total]="total" [page]="page" [limit]="limit" [loading]="loading" [columns]="columns" (rowClick)="onRow($event)" (pageChange)="onPage($event)" (statusChange)="onStatus($event)"></app-finding-table>
+  </div></div>
+  <div class="side-panel-overlay" *ngIf="showPanel" (click)="showPanel=false"></div>
+  <div class="side-panel" [class.open]="showPanel" *ngIf="selected">
+    <div class="side-panel-header"><strong>{{selected.finding_title||'Detail'}}</strong><button class="btn btn-sm" (click)="showPanel=false"><i class="fa fa-times"></i></button></div>
+    <div class="side-panel-body"><div *ngFor="let k of objectKeys(selected)" class="field-row"><div class="field-label">{{k}}</div><div class="field-value small">{{selected[k]}}</div></div></div>
+  </div>
+</div>

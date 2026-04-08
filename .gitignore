@@ -1,0 +1,61 @@
+# ─── Secrets ────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+.vault-token
+
+# ─── Node ───────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.yarn-integrity
+.pnp.*
+
+# ─── Angular / build artifacts ──────────────────────────────────────────────
+dist/
+tmp/
+out-tsc/
+bazel-out/
+.angular/
+*.tsbuildinfo
+
+# ─── Runtime / uploads ──────────────────────────────────────────────────────
+aspm-v3/backend/uploads/
+uploads/
+*.pid
+*.seed
+*.pid.lock
+
+# ─── Logs ───────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Coverage / test output ─────────────────────────────────────────────────
+coverage/
+.nyc_output/
+junit.xml
+test-results/
+
+# ─── IDE / OS ───────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── Docker / local data ────────────────────────────────────────────────────
+.docker-data/
+mysql-data/
+
+# ─── Misc ───────────────────────────────────────────────────────────────────
+*.tgz
+.cache/

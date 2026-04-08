@@ -1,0 +1,80 @@
+<div>
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-2">
+      <a routerLink="/app-posture" class="btn btn-sm btn-outline-secondary"><i class="fa fa-arrow-left"></i></a>
+      <div><div class="page-title">Firewall Rules Analysis</div><div class="text-muted small">Palo Alto · Fortinet · Checkpoint — risk-scored rule review</div></div>
+    </div>
+    <div class="d-flex gap-2">
+      <span class="badge bg-secondary rounded-pill">{{total}} rules</span>
+      <button class="btn btn-sm btn-outline-secondary export-btn" (click)="exportCsv()" [disabled]="!rules.length"><i class="fa fa-download me-1"></i>Export</button>
+    </div>
+  </div>
+  <div class="row g-3 mb-4" *ngIf="summary.length">
+    <div class="col-md-4" *ngFor="let s of summary">
+      <div class="card text-center p-3" [ngStyle]="{'border-top':'4px solid #e53935'}">
+        <div class="fw-bold text-uppercase small mb-2">{{s.vendor}}</div>
+        <div class="row">
+          <div class="col"><div class="fw-bold text-danger" style="font-size:1.4rem">{{s.permissive_count}}</div><div style="font-size:.65rem;color:#c62828">Permissive</div></div>
+          <div class="col"><div class="fw-bold text-warning" style="font-size:1.4rem">{{s.no_log_count}}</div><div style="font-size:.65rem;color:#e65100">No Log</div></div>
+          <div class="col"><div class="fw-bold" style="font-size:1.4rem">{{s.total_rules}}</div><div style="font-size:.65rem;color:#666">Total</div></div>
+        </div>
+        <div class="mt-2"><div style="height:4px;background:#f5f5f5;border-radius:2px"><div class="bg-danger" style="height:100%;border-radius:2px" [style.width.%]="(s.permissive_count/s.total_rules)*100"></div></div></div>
+      </div>
+    </div>
+    <div class="col-md-12" *ngIf="summary.length>1">
+      <div class="card"><div class="card-header"><i class="fa fa-chart-bar me-1 text-danger"></i>Risk Comparison by Vendor</div>
+      <div class="card-body"><app-chart type="bar" [labels]="summaryLabels" [datasets]="summaryDatasets" [height]="160" [options]="{plugins:{legend:{position:'top'}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f5f5f5'}}}}"></app-chart></div></div>
+    </div>
+  </div>
+  <div class="card mb-3"><div class="card-body py-2">
+    <div class="row g-2">
+      <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.vendor" (change)="apply()"><option value="">All Vendors</option><option *ngFor="let v of vendors" [value]="v">{{v}}</option></select></div>
+      <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.riskType" (change)="apply()"><option value="">All Risk Types</option><option value="permissive">Permissive</option><option value="no_log">No Logging</option><option value="undocumented">Undocumented</option></select></div>
+      <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.action" (change)="apply()"><option value="">All Actions</option><option *ngFor="let a of actions" [value]="a">{{a}}</option></select></div>
+      <div class="col-md-3"><button class="btn btn-sm btn-primary me-1" (click)="apply()">Filter</button><button class="btn btn-sm btn-outline-secondary" (click)="clear()">Clear</button></div>
+    </div>
+  </div></div>
+  <div class="card"><div class="card-body p-0"><div class="table-responsive">
+    <table class="table data-table mb-0">
+      <thead><tr><th>#</th><th>Vendor</th><th>Rule Name</th><th>Source → Dest</th><th>Action</th><th>Risk Score</th><th>Log</th><th>Flags</th></tr></thead>
+      <tbody>
+        <tr *ngIf="loading"><td colspan="8" class="text-center py-5"><div class="spinner-border text-primary spinner-border-sm"></div></td></tr>
+        <tr *ngFor="let r of rules" [ngClass]="riskClass(r)" class="clickable" (click)="open(r)">
+          <td class="small text-muted">{{r.rule_num}}</td>
+          <td><span class="risk-badge badge-low">{{r.vendor}}</span></td>
+          <td class="small" style="max-width:120px"><div class="text-truncate" [title]="r.rule_name">{{r.rule_name||'—'}}</div></td>
+          <td class="small" style="max-width:160px">
+            <div class="text-truncate text-muted" [title]="r.source+'→'+r.destination">{{r.source}} → {{r.destination}}</div>
+          </td>
+          <td><span class="risk-badge" [ngClass]="r.action==='allow'||r.action==='accept'?'badge-low':'badge-critical'">{{r.action}}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:50px;height:6px;background:#f0f0f0;border-radius:3px">
+                <div style="height:100%;border-radius:3px;transition:width .3s" [ngStyle]="{'width': (r.risk_score/10)*100+'%','background': r.risk_score>5?'#e53935':r.risk_score>2?'#fb8c00':'#43a047'}"></div>
+              </div>
+              <strong [ngClass]="r.risk_score>5?'text-danger':r.risk_score>2?'text-warning':'text-success'">{{r.risk_score | number:'1.0-1'}}</strong>
+            </div>
+          </td>
+          <td><i class="fa" [ngClass]="r.log_enabled?'fa-check text-success':'fa-times text-danger'"></i></td>
+          <td><span *ngFor="let f of (r.risk_flags||[])" class="risk-badge badge-medium me-1" style="font-size:.6rem">{{f.type}}</span></td>
+        </tr>
+        <tr *ngIf="!loading&&!rules.length"><td colspan="8" class="text-center py-5"><i class="fa fa-inbox fa-2x text-muted mb-2 d-block"></i><div class="small text-muted">No rules. Upload Firewall CSV.</div></td></tr>
+      </tbody>
+    </table>
+  </div></div></div>
+  <div class="side-overlay" *ngIf="showPanel" (click)="close()"></div>
+  <div class="side-panel" *ngIf="showPanel">
+    <div class="side-panel-header"><h6 class="mb-0">Rule Detail</h6><button class="btn btn-sm btn-outline-secondary" (click)="close()"><i class="fa fa-times"></i></button></div>
+    <div class="side-panel-body" *ngIf="selected">
+      <div class="mb-3 p-3 rounded-3" [ngStyle]="{'background': selected.risk_score>5?'#fdecea':selected.risk_score>2?'#fff3e0':'#e8f5e9'}">
+        <div class="fw-bold" style="font-size:1.2rem" [ngStyle]="{'color': selected.risk_score>5?'#c62828':selected.risk_score>2?'#e65100':'#1b5e20'}">Risk Score: {{selected.risk_score | number:'1.0-1'}}</div>
+        <div class="small mt-1">{{selected.rule_name||'Rule #'+selected.rule_num}}</div>
+      </div>
+      <div *ngFor="let k of objectKeys(selected)">
+        <div *ngIf="selected[k]!==null&&selected[k]!==''&&k!=='raw_data'&&k!=='id'&&k!=='ingestion_id'" class="field-group">
+          <div class="field-label">{{k.replace(/_/g,' ')}}</div><div class="field-value">{{selected[k]}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

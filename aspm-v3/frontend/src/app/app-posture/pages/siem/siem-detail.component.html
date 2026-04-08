@@ -1,0 +1,62 @@
+<div>
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-2">
+      <a routerLink="/app-posture" class="btn btn-sm btn-outline-secondary"><i class="fa fa-arrow-left"></i></a>
+      <div><div class="page-title">SIEM / ITSM Incidents</div><div class="text-muted small">Security incidents, SLA tracking and kill chain mapping</div></div>
+    </div>
+    <div class="d-flex gap-2">
+      <span class="badge bg-secondary rounded-pill">{{total}}</span>
+      <button class="btn btn-sm btn-outline-secondary export-btn" (click)="exportCsv()" [disabled]="!incidents.length"><i class="fa fa-download me-1"></i>Export</button>
+    </div>
+  </div>
+  <div class="card mb-4" *ngIf="killChain.length">
+    <div class="card-header"><i class="fa fa-link me-1 text-primary"></i>Kill Chain Stage Distribution</div>
+    <div class="card-body"><app-chart type="bar" [labels]="kcLabels" [datasets]="kcDatasets" [height]="180" [options]="{indexAxis:'y',plugins:{legend:{position:'top'}},scales:{x:{grid:{color:'#f5f5f5'}},y:{grid:{display:false}}}}"></app-chart></div>
+  </div>
+  <div class="card mb-3"><div class="card-body py-2">
+    <div class="row g-2">
+      <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.priority" (change)="apply()"><option value="">All Priority</option><option *ngFor="let p of priorities" [value]="p">{{p}}</option></select></div>
+      <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.slaBreached" (change)="apply()"><option value="">SLA Status</option><option value="true">SLA Breached</option></select></div>
+      <div class="col-md-2"><select class="form-select form-select-sm" [(ngModel)]="filters.toBeBlocked" (change)="apply()"><option value="">Block Status</option><option value="true">To Be Blocked</option></select></div>
+      <div class="col-md-3"><input class="form-control form-control-sm" [(ngModel)]="filters.q" placeholder="Search ID / hostname..." (keyup.enter)="apply()"></div>
+      <div class="col-md-3"><button class="btn btn-sm btn-primary me-1" (click)="apply()">Filter</button><button class="btn btn-sm btn-outline-secondary" (click)="clear()">Clear</button></div>
+    </div>
+  </div></div>
+  <div class="card"><div class="card-body p-0"><div class="table-responsive">
+    <table class="table data-table mb-0">
+      <thead><tr><th>Incident</th><th>Priority</th><th>Kill Chain</th><th>Risk</th><th>SLA</th><th>Block</th><th>Date</th></tr></thead>
+      <tbody>
+        <tr *ngIf="loading"><td colspan="7" class="text-center py-5"><div class="spinner-border text-primary spinner-border-sm me-2"></div>Loading...</td></tr>
+        <tr *ngFor="let i of incidents" class="clickable" (click)="open(i)"
+            [class.row-critical]="i.sla_breached||i.to_be_blocked">
+          <td><div class="fw-bold small">{{i.title||i.incident_summary}}</div><div class="text-muted" style="font-size:.7rem;font-family:monospace">{{i.incident_id}}</div></td>
+          <td><span [ngClass]="priClass(i.priority)">{{i.priority}}</span></td>
+          <td class="small text-muted">{{i.kill_chain||'—'}}</td>
+          <td><strong [ngClass]="i.risk_score>10?'text-danger':i.risk_score>5?'text-warning':'text-success'">{{i.risk_score}}</strong></td>
+          <td><i class="fa" [ngClass]="i.sla_breached?'fa-exclamation-triangle text-danger':'fa-check text-success'"></i></td>
+          <td><i class="fa" [ngClass]="i.to_be_blocked?'fa-ban text-danger':'fa-minus text-muted'"></i></td>
+          <td class="small text-muted">{{i.date_created | date:'dd MMM yy'}}</td>
+        </tr>
+        <tr *ngIf="!loading&&!incidents.length"><td colspan="7" class="text-center py-5"><i class="fa fa-inbox fa-2x text-muted mb-2 d-block"></i><div class="small text-muted">No incidents. Upload SIEM CSV from <a routerLink="/app-posture/ingestion">Ingestion</a>.</div></td></tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top" *ngIf="total>limit">
+      <div class="small text-muted">Page {{page}} of {{pages}}</div>
+      <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="page<=1" (click)="page=page-1;load()"><i class="fa fa-chevron-left"></i></button>
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="page>=pages" (click)="page=page+1;load()"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div></div></div>
+  <div class="side-overlay" *ngIf="showPanel" (click)="close()"></div>
+  <div class="side-panel" *ngIf="showPanel">
+    <div class="side-panel-header"><h6 class="mb-0">Incident Detail</h6><button class="btn btn-sm btn-outline-secondary" (click)="close()"><i class="fa fa-times"></i></button></div>
+    <div class="side-panel-body" *ngIf="selected">
+      <div *ngFor="let k of objectKeys(selected)">
+        <div *ngIf="selected[k]!==null&&selected[k]!==''&&k!=='raw_data'&&k!=='id'&&k!=='ingestion_id'" class="field-group">
+          <div class="field-label">{{k.replace(/_/g,' ')}}</div><div class="field-value">{{selected[k]}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

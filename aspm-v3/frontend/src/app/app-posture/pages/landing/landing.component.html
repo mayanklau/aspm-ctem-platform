@@ -1,0 +1,236 @@
+<div>
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-3">
+      <div>
+        <div class="page-title">Application Security Posture</div>
+        <div class="text-muted small">ASPM · CTEM · Risk Scoring Platform</div>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-outline-secondary export-btn" (click)="exportCsv()"><i class="fa fa-download me-1"></i>Export CSV</button>
+      <a routerLink="ingestion"    class="btn btn-sm btn-outline-primary"><i class="fa fa-upload me-1"></i>Upload</a>
+      <a routerLink="integrations" class="btn btn-sm bg-ey border-0 text-warning"><i class="fa fa-plug me-1"></i>Integrations</a>
+    </div>
+  </div>
+
+  <!-- Loading skeletons -->
+  <div *ngIf="loading" class="row g-3 mb-4">
+    <div class="col-md-3" *ngFor="let i of [1,2,3,4]"><div class="skeleton" style="height:100px"></div></div>
+  </div>
+
+  <!-- Enterprise Score Row -->
+  <div *ngIf="!loading && enterprise" class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="score-tile" [ngClass]="enterprise.bank_score<=4?'red':enterprise.bank_score<=7?'amber':'green'">
+        <div class="label">Bank Posture Score</div>
+        <div class="value" [ngStyle]="{'color': scoreColor(enterprise.bank_score)}">{{enterprise.bank_score | number:'1.1-1'}}</div>
+        <div class="sub">Overall enterprise risk</div>
+        <div class="trend">
+          <span class="badge rounded-pill" [ngStyle]="{'background': scoreBg(enterprise.bank_score), 'color': scoreColor(enterprise.bank_score)}">
+            {{enterprise.bank_score<=4?'High Risk':enterprise.bank_score<=7?'Medium Risk':'Low Risk'}}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="score-tile blue">
+        <div class="label">Applications Tracked</div>
+        <div class="value" style="color:#2e5bff">{{apps.length}}</div>
+        <div class="sub">Active in platform</div>
+        <div class="trend small text-muted mt-2">{{enterprise.business_units?.length}} Business Units</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="score-tile red">
+        <div class="label">Total Critical Findings</div>
+        <div class="value" style="color:#e53935">{{apps | sumBy:'total_critical'}}</div>
+        <div class="sub">Across all applications</div>
+        <div class="trend small mt-2"><span class="text-warning">{{apps | sumBy:'total_high'}}</span> High findings</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="score-tile green">
+        <div class="label">Avg Coverage</div>
+        <div class="value" style="color:#2e7d32">{{(apps | avgBy:'coverage_percentage') | number:'1.0-0'}}%</div>
+        <div class="sub">Report type coverage</div>
+        <div class="trend">
+          <div class="mt-2" style="height:5px;background:#e8f5e9;border-radius:3px"><div style="height:100%;background:#2e7d32;border-radius:3px" [style.width.%]="(apps | avgBy:'coverage_percentage')"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4" *ngIf="!loading">
+    <!-- App list + gauges -->
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="fa fa-list-ul me-1 text-primary"></i>Applications</span>
+          <span class="badge bg-primary rounded-pill">{{apps.length}}</span>
+        </div>
+        <div style="overflow-y:auto;max-height:420px">
+          <div *ngFor="let app of apps" (click)="selectApp(app)"
+               class="d-flex align-items-center gap-3 p-3 clickable"
+               style="border-bottom:1px solid #f5f5f5;transition:background .12s"
+               [ngStyle]="{'background': selectedApp?.app_id===app.app_id ? '#f0f4ff' : 'transparent'}">
+            <div class="flex-fill">
+              <div class="fw-bold small">{{app.app_name}}</div>
+              <div class="text-muted" style="font-size:.7rem">{{app.business_unit}} · {{app.domain}}</div>
+              <div class="mt-1" style="height:4px;background:#f0f0f0;border-radius:2px;width:100%">
+                <div style="height:100%;border-radius:2px;transition:width .4s" [style.background]="scoreColor(app.final_posture_score)" [style.width.%]="(app.final_posture_score/10)*100"></div>
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="fw-bold" [ngStyle]="{'color': scoreColor(app.final_posture_score), 'font-size':'1.3rem'}">{{app.final_posture_score | number:'1.1-1'}}</div>
+              <div style="font-size:.6rem;color:#aaa">/10</div>
+            </div>
+          </div>
+          <div *ngIf="!apps.length" class="text-center text-muted p-4 small">No apps yet. Upload a report.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected App Panel -->
+    <div class="col-md-8" *ngIf="selectedApp">
+      <!-- Score Gauges -->
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="fa fa-gauge-high me-1 text-primary"></i>{{selectedApp.app_name}}</span>
+          <div class="d-flex gap-2 align-items-center">
+            <span class="badge" [ngStyle]="{'background':scoreBg(selectedApp.final_posture_score),'color':scoreColor(selectedApp.final_posture_score)}">
+              {{selectedApp.asset_criticality | titlecase}}
+            </span>
+            <button class="btn btn-sm btn-primary" (click)="compute()" [disabled]="computing">
+              <i class="fa me-1" [ngClass]="computing?'fa-spinner fa-spin':'fa-calculator'"></i>
+              {{computing?'Computing...':'Recompute'}}
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row text-center g-3">
+            <div class="col-3">
+              <app-gauge [score]="selectedApp.final_posture_score" [size]="110" label="Final"></app-gauge>
+              <div class="small text-muted mt-1" style="font-size:.68rem">Level 3 Score</div>
+            </div>
+            <div class="col-3">
+              <app-gauge [score]="selectedApp.new_app_security_score" [size]="110" label="New App"></app-gauge>
+              <div class="small text-muted mt-1" style="font-size:.68rem">Level 2 Score</div>
+            </div>
+            <div class="col-3">
+              <app-gauge [score]="selectedApp.cpr_score" [size]="110" label="CPR"></app-gauge>
+              <div class="small text-muted mt-1" style="font-size:.68rem">CRVM Input</div>
+            </div>
+            <div class="col-3 d-flex flex-column align-items-center justify-content-center">
+              <div class="fw-bold" style="font-size:2rem;color:#2e5bff">{{selectedApp.coverage_percentage | number:'1.0-0'}}%</div>
+              <div style="font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.4px">Coverage</div>
+              <div class="mt-1 small text-muted">{{(selectedApp.reports_assessed?.length || 0)}} / 17 types</div>
+            </div>
+          </div>
+          <!-- Finding counts -->
+          <div class="row g-2 mt-3">
+            <div class="col-3">
+              <div class="rounded p-2 text-center" style="background:#fdecea">
+                <div class="fw-bold" style="color:#e53935;font-size:1.4rem">{{selectedApp.total_critical}}</div>
+                <div style="font-size:.68rem;color:#c62828;font-weight:600">Critical</div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="rounded p-2 text-center" style="background:#fff3e0">
+                <div class="fw-bold" style="color:#fb8c00;font-size:1.4rem">{{selectedApp.total_high}}</div>
+                <div style="font-size:.68rem;color:#e65100;font-weight:600">High</div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="rounded p-2 text-center" style="background:#fffde7">
+                <div class="fw-bold" style="color:#f9a825;font-size:1.4rem">{{selectedApp.total_medium}}</div>
+                <div style="font-size:.68rem;color:#f57f17;font-weight:600">Medium</div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="rounded p-2 text-center" style="background:#e8f5e9">
+                <div class="fw-bold" style="color:#43a047;font-size:1.4rem">{{selectedApp.total_low}}</div>
+                <div style="font-size:.68rem;color:#2e7d32;font-weight:600">Low</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-header"><i class="fa fa-chart-bar me-1 text-warning"></i>Finding Distribution</div>
+            <div class="card-body">
+              <app-chart type="bar" [labels]="sevChartLabels" [datasets]="sevChartData" [height]="160"></app-chart>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-header"><i class="fa fa-chart-line me-1 text-primary"></i>Score Trend</div>
+            <div class="card-body">
+              <div *ngIf="!trendLabels.length" class="text-center text-muted py-4 small">
+                <i class="fa fa-clock-rotate-left fa-2x mb-2 d-block text-muted"></i>
+                Trend builds after first recompute
+              </div>
+              <app-chart *ngIf="trendLabels.length" type="line" [labels]="trendLabels" [datasets]="trendData" [height]="160"></app-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coverage Heatmap -->
+  <div class="card mb-4" *ngIf="heatmap.length">
+    <div class="card-header"><i class="fa fa-th me-1 text-primary"></i>Report Coverage Heatmap — {{selectedApp?.app_name}}</div>
+    <div class="card-body">
+      <div class="row g-2">
+        <div class="col-6 col-md-2" *ngFor="let h of heatmap">
+          <a [routerLink]="h.key.replace('_','-')" class="text-decoration-none d-block">
+            <div class="rounded-3 p-2 text-center" style="transition:transform .15s;cursor:pointer" [ngStyle]="{'background': heatBg(h)}" [class.hovered]="true">
+              <div class="small fw-bold" style="font-size:.72rem" [ngStyle]="{'color': heatColor(h)}">{{h.label}}</div>
+              <div style="font-size:.8rem;font-weight:800;margin:2px 0" [ngStyle]="{'color': heatColor(h)}">
+                {{h.assessed ? (h.norm_score | number:'1.1-1') : '—'}}
+              </div>
+              <div style="font-size:.62rem;color:#aaa">w: {{h.weight}}</div>
+              <div *ngIf="!h.assessed" class="badge bg-secondary mt-1" style="font-size:.55rem">Not Assessed</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BU Heatmap -->
+  <div class="row g-3 mb-4" *ngIf="enterprise?.business_units?.length">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header"><i class="fa fa-building me-1 text-primary"></i>Business Unit Posture</div>
+        <div class="card-body">
+          <div class="bu-grid">
+            <div *ngFor="let bu of enterprise.business_units" class="bu-cell" [ngStyle]="{'background': buBg(bu.score)}" [routerLink]="[]">
+              <div class="bv" [ngStyle]="{'color': buColor(bu.score)}">{{bu.score | number:'1.1-1'}}</div>
+              <div class="bn" [ngStyle]="{'color': buColor(bu.score)}">{{bu.name}}</div>
+              <div class="bc">{{bu.app_count}} apps · {{bu.critical_count}} crit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Nav -->
+  <div class="section-title mb-2">Quick Navigation</div>
+  <div class="row g-2 mb-4">
+    <div class="col-6 col-md-2" *ngFor="let n of reportNav">
+      <a [routerLink]="n.path" class="nav-card d-block">
+        <div class="ni"><i class="fa {{n.icon}}" [ngStyle]="{'color':n.color}"></i></div>
+        <div class="nl">{{n.label}}</div>
+        <div style="font-size:.65rem;color:#aaa">{{n.desc}}</div>
+      </a>
+    </div>
+  </div>
+</div>

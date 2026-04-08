@@ -1,0 +1,7 @@
+RULENUM,FROM,SOURCE,TO,DESTINATION,SERVICE,USER,ACTION,ENABLE,NAME,LOG,COMMENT,APPLICATION,TAG,PROFILE,URL_CATEGORY,Documentation
+1,untrust,any,dmz,10.10.1.0/24,application-default,any,allow,yes,allow-web-inbound,yes,Allow inbound web traffic,web-browsing,,strict,any,
+2,dmz,10.10.1.0/24,trust,10.20.0.0/16,application-default,any,allow,yes,dmz-to-trust,yes,DMZ to trust zone,any,,,,
+3,any,any,any,any,any,any,allow,yes,permit-all-risky,no,,any,,,,
+4,trust,10.20.0.0/16,untrust,any,application-default,any,allow,yes,outbound-internet,yes,Outbound internet access,ssl,,,
+5,untrust,any,dmz,10.10.1.50,service-https,any,allow,yes,allow-api-gateway,yes,,ssl,,strict,,Allow API gateway access
+6,trust,10.20.10.5,any,any,any,any,allow,no,test-rule-disabled,no,,any,,,,Testing rule - disabled

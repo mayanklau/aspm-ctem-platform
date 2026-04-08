@@ -1,0 +1,20 @@
+'use strict';
+const { Op } = require('sequelize');
+const ScoringEngine = require('../../services/scoring/ScoringEngine');
+const R = require('../../utils/response');
+const { paginate } = require('../../utils/helpers');
+module.exports = {
+  async getApplicationScore(req,res){const M=req.app.get('models');try{const s=await M.AppPostureScore.findOne({where:{app_id:req.params.appId}});return s?R.success(res,s):R.notFound(res,'Score not found — trigger recompute');}catch(e){return R.error(res,e.message);}},
+  async recomputeApplicationScore(req,res){const M=req.app.get('models');try{const e=new ScoringEngine(M);const d=await e.computeApplicationScore(req.params.appId);const ex=await M.AppPostureScore.findOne({where:{app_id:req.params.appId}});if(ex)await ex.update(d);else await M.AppPostureScore.create(d);const today=new Date().toISOString().split('T')[0];await M.ScoreHistory.upsert({app_id:req.params.appId,snapshot_date:today,new_app_security_score:d.new_app_security_score,cpr_score:d.cpr_score,final_posture_score:d.final_posture_score,total_critical:d.total_critical,total_high:d.total_high,coverage_percentage:d.coverage_percentage});return R.success(res,d);}catch(e){return R.error(res,e.message);}},
+  async getScoreTrend(req,res){const M=req.app.get('models');const months=parseInt(req.query.months||'12');const since=new Date();since.setMonth(since.getMonth()-months);try{const h=await M.ScoreHistory.findAll({where:{app_id:req.params.appId,snapshot_date:{[Op.gte]:since}},order:[['snapshot_date','ASC']]});return R.success(res,h);}catch(e){return R.error(res,e.message);}},
+  async getEnterpriseScores(req,res){const M=req.app.get('models');try{const e=new ScoringEngine(M);return R.success(res,await e.computeEnterpriseScores());}catch(e){return R.error(res,e.message);}},
+  async getAllApplicationScores(req,res){const M=req.app.get('models');const{bu,domain,orderBy='final_posture_score',order='ASC',page=1,limit=50}=req.query;const where={};if(bu)where.business_unit=bu;if(domain)where.domain=domain;try{const{rows,count}=await M.AppPostureScore.findAndCountAll({where,order:[[orderBy,order]],...paginate(null,page,limit)});return R.paginated(res,rows,count,page,limit);}catch(e){return R.error(res,e.message);}},
+  async getCoverageHeatmap(req,res){
+    const M=req.app.get('models');const{appId}=req.query;
+    const LABELS=[{key:'sast',label:'SAST',weight:7},{key:'dast',label:'DAST',weight:7},{key:'sca',label:'SCA',weight:6},{key:'va',label:'VA Scanner',weight:6},{key:'bas',label:'BAS',weight:7},{key:'cart',label:'CART',weight:6},{key:'firewall',label:'Firewall Rules',weight:5},{key:'waf',label:'WAF Config',weight:5},{key:'ips',label:'IPS Signatures',weight:5},{key:'siem',label:'SIEM / ITSM',weight:7},{key:'pt_external',label:'External Web App PT',weight:8},{key:'pt_internal',label:'Internal Web App PT',weight:6},{key:'pt_mobile',label:'Mobile PT',weight:8},{key:'red_team',label:'Red Team',weight:8},{key:'audit',label:'Audit Findings',weight:5},{key:'os_compliance',label:'OS Compliance',weight:5},{key:'db_compliance',label:'DB Compliance',weight:5}];
+    try{const s=await M.AppPostureScore.findOne({where:{app_id:appId}});const assessed=s?.reports_assessed?(typeof s.reports_assessed==='string'?JSON.parse(s.reports_assessed):s.reports_assessed):[];const hm=LABELS.map(r=>({...r,assessed:assessed.includes(r.key),norm_score:s?s[`${r.key}_norm_score`]??null:null}));return R.success(res,{app_id:appId,heatmap:hm,coverage_pct:s?.coverage_percentage??0});}
+    catch(e){return R.error(res,e.message);}
+  },
+  async getWeightages(req,res){const M=req.app.get('models');try{return R.success(res,await M.ReportWeightage.findAll({order:[['report_type','ASC']]}));}catch(e){return R.error(res,e.message);}},
+  async updateWeightages(req,res){const M=req.app.get('models');try{const updates=req.body;for(const u of updates)await M.ReportWeightage.upsert({...u,updated_by:req.user?.username});return R.success(res,{updated:updates.length});}catch(e){return R.error(res,e.message);}}
+};

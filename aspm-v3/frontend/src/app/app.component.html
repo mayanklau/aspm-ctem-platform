@@ -1,0 +1,43 @@
+<div class="app-layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-ey">EY</div>
+      <div class="logo-sub">ASPM / CTEM Platform</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Dashboard</div>
+      <a class="nav-item" routerLink="/app-posture" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <i class="fa fa-gauge-high"></i> Posture Overview
+      </a>
+      <div class="sidebar-section">Application Reports</div>
+      <a class="nav-item" routerLink="/app-posture/sast" routerLinkActive="active"><i class="fa fa-code"></i> SAST</a>
+      <a class="nav-item" routerLink="/app-posture/dast" routerLinkActive="active"><i class="fa fa-globe"></i> DAST</a>
+      <a class="nav-item" routerLink="/app-posture/sca" routerLinkActive="active"><i class="fa fa-box-open"></i> SCA</a>
+      <a class="nav-item" routerLink="/app-posture/bas" routerLinkActive="active"><i class="fa fa-robot"></i> BAS</a>
+      <a class="nav-item" routerLink="/app-posture/cart" routerLinkActive="active"><i class="fa fa-clipboard-check"></i> CART</a>
+      <div class="sidebar-section">Penetration Testing</div>
+      <a class="nav-item" routerLink="/app-posture/pt-external" routerLinkActive="active"><i class="fa fa-earth-americas"></i> External PT</a>
+      <a class="nav-item" routerLink="/app-posture/pt-internal" routerLinkActive="active"><i class="fa fa-network-wired"></i> Internal PT</a>
+      <a class="nav-item" routerLink="/app-posture/pt-mobile" routerLinkActive="active"><i class="fa fa-mobile-screen"></i> Mobile PT</a>
+      <a class="nav-item" routerLink="/app-posture/redteam" routerLinkActive="active"><i class="fa fa-user-secret"></i> Red Team</a>
+      <div class="sidebar-section">Infrastructure</div>
+      <a class="nav-item" routerLink="/app-posture/firewall" routerLinkActive="active"><i class="fa fa-shield-halved"></i> Firewall</a>
+      <a class="nav-item" routerLink="/app-posture/waf" routerLinkActive="active"><i class="fa fa-filter"></i> WAF</a>
+      <a class="nav-item" routerLink="/app-posture/ips" routerLinkActive="active"><i class="fa fa-eye"></i> IPS</a>
+      <a class="nav-item" routerLink="/app-posture/siem" routerLinkActive="active"><i class="fa fa-chart-line"></i> SIEM / ITSM</a>
+      <div class="sidebar-section">Compliance</div>
+      <a class="nav-item" routerLink="/app-posture/audit" routerLinkActive="active"><i class="fa fa-file-contract"></i> Audit</a>
+      <a class="nav-item" routerLink="/app-posture/os-compliance" routerLinkActive="active"><i class="fa fa-server"></i> OS Compliance</a>
+      <a class="nav-item" routerLink="/app-posture/db-compliance" routerLinkActive="active"><i class="fa fa-database"></i> DB Compliance</a>
+      <div class="sidebar-section">Configuration</div>
+      <a class="nav-item" routerLink="/app-posture/ingestion" routerLinkActive="active"><i class="fa fa-upload"></i> Ingestion</a>
+      <a class="nav-item" routerLink="/app-posture/integrations" routerLinkActive="active"><i class="fa fa-plug"></i> Integrations</a>
+      <a class="nav-item" routerLink="/app-posture/score-admin" routerLinkActive="active"><i class="fa fa-sliders"></i> Score Admin</a>
+    </div>
+  </nav>
+  <!-- Main content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

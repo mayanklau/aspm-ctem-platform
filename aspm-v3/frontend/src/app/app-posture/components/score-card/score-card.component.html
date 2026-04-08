@@ -1,0 +1,5 @@
+<div class="score-tile" [ngClass]="cls">
+  <div class="score-tile-value">{{value !== null ? (value | number:'1.1-1') : '—'}}<span class="score-max">/10</span></div>
+  <div class="score-tile-label"><i class="fa mr-1" [ngClass]="icon"></i>{{label}}</div>
+  <div class="score-tile-sub" *ngIf="sub">{{sub}}</div>
+</div>

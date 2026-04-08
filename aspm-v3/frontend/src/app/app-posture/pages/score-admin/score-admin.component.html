@@ -1,0 +1,37 @@
+<div>
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-2">
+      <a routerLink="/app-posture" class="btn btn-sm btn-outline-secondary"><i class="fa fa-arrow-left"></i></a>
+      <div><div class="page-title">Score Weightage Admin</div><div class="text-muted small">Tune Level 2 scoring weights per report type</div></div>
+    </div>
+    <button class="btn btn-primary" (click)="save()" [disabled]="saving"><i class="fa fa-save me-1"></i>{{saving?'Saving...':'Save Changes'}}</button>
+  </div>
+  <div *ngIf="saved" class="alert alert-success py-2"><i class="fa fa-check-circle me-1"></i>Weightages saved successfully!</div>
+  <div class="card">
+    <div class="card-header"><i class="fa fa-sliders me-1 text-primary"></i>Report Type Weightages</div>
+    <div class="card-body">
+      <div *ngIf="loading" class="text-center py-4"><div class="spinner-border text-primary spinner-border-sm"></div></div>
+      <div class="row g-3" *ngIf="!loading">
+        <div class="col-md-6" *ngFor="let w of weightages">
+          <div class="border rounded-3 p-3 d-flex align-items-center gap-3">
+            <div class="flex-fill">
+              <div class="fw-bold small">{{w.label}}</div>
+              <div class="small text-muted">{{w.report_type}}</div>
+              <div class="mt-2" style="height:6px;background:#f0f0f0;border-radius:3px">
+                <div class="bg-primary" style="height:100%;border-radius:3px;transition:width .3s" [style.width.%]="(w.weightage/10)*100"></div>
+              </div>
+            </div>
+            <div class="text-center" style="width:70px">
+              <input type="number" class="form-control form-control-sm text-center fw-bold" [(ngModel)]="w.weightage" min="0" max="10" step="0.5">
+              <div class="small text-muted mt-1">/ 10</div>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="w.enabled">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-info mt-3 py-2 small"><i class="fa fa-info-circle me-1"></i><strong>Note:</strong> Changes apply on next score recompute. Higher weight = greater impact on Final Posture Score (Level 3).</div>
+    </div>
+  </div>
+</div>

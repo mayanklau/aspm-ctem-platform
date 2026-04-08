@@ -1,0 +1,83 @@
+<div>
+  <div class="top-bar">
+    <div class="d-flex align-items-center gap-2">
+      <a routerLink="/app-posture" class="btn btn-sm btn-outline-secondary"><i class="fa fa-arrow-left"></i></a>
+      <div><div class="page-title">API Integrations</div><div class="text-muted small">Auto-sync findings from security tools — SonarQube, QRadar, ZAP, Snyk, Fortinet and more</div></div>
+    </div>
+    <button class="btn btn-primary btn-sm" (click)="openForm()"><i class="fa fa-plus me-1"></i>Add Integration</button>
+  </div>
+
+  <!-- Integration templates -->
+  <div class="card mb-4" *ngIf="!integrations.length">
+    <div class="card-header"><i class="fa fa-bolt me-1 text-warning"></i>Quick Start — Pre-configured Templates</div>
+    <div class="card-body">
+      <div class="row g-2">
+        <div class="col-md-3" *ngFor="let t of templates">
+          <div class="border rounded-3 p-3 clickable" style="transition:box-shadow .15s" (click)="openForm();useTemplate(t)">
+            <div class="fw-bold small">{{t.name}}</div>
+            <div class="small text-muted">{{t.report_type}} · {{t.poll_interval}}</div>
+            <div class="mt-1" style="font-size:.65rem;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{t.endpoint_url}}</div>
+            <div class="mt-2"><span class="risk-badge badge-info small">Use Template</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card"><div class="card-body p-0"><div class="table-responsive">
+    <table class="table data-table mb-0">
+      <thead><tr><th>Integration</th><th>Type</th><th>Tool</th><th>Schedule</th><th>Last Sync</th><th>Status</th><th>Records</th><th></th></tr></thead>
+      <tbody>
+        <tr *ngIf="loading"><td colspan="8" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>
+        <tr *ngFor="let c of integrations">
+          <td><div class="fw-bold small">{{c.name}}</div><div class="text-muted" style="font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">{{c.endpoint_url}}</div></td>
+          <td><span class="risk-badge badge-info small">{{c.report_type}}</span></td>
+          <td class="small">{{c.tool||'—'}}</td>
+          <td class="small">{{c.poll_interval}}</td>
+          <td class="small text-muted">{{(c.last_sync_at|date:'dd MMM HH:mm')||'Never'}}</td>
+          <td><span [ngClass]="stsClass(c.last_sync_status)"><i class="fa fa-circle me-1" style="font-size:.5rem"></i>{{c.last_sync_status||'never_run'}}</span></td>
+          <td class="small">{{c.last_sync_count||0}}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary me-1" (click)="sync(c.id)" [disabled]="syncing[c.id]" title="Sync now"><i class="fa" [ngClass]="syncing[c.id]?'fa-spinner fa-spin':'fa-rotate'"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1" (click)="openForm(c)"><i class="fa fa-pen"></i></button>
+            <button class="btn btn-sm btn-outline-danger" (click)="delete(c.id)"><i class="fa fa-trash"></i></button>
+          </td>
+        </tr>
+        <tr *ngIf="!loading&&!integrations.length"><td colspan="8" class="text-center py-4 small text-muted">No integrations yet. Add one above or use a template.</td></tr>
+      </tbody>
+    </table>
+  </div></div></div>
+
+  <!-- Slide-over form -->
+  <div class="side-overlay" *ngIf="showForm" (click)="closeForm()"></div>
+  <div class="side-panel" *ngIf="showForm">
+    <div class="side-panel-header">
+      <div><div class="fw-bold">{{editId?'Edit':'New'}} Integration</div><div class="small text-muted">Configure tool API connection</div></div>
+      <button class="btn btn-sm btn-outline-secondary" (click)="closeForm()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="p-3">
+      <!-- Templates inside form -->
+      <div class="mb-3" *ngIf="!editId">
+        <label class="small text-muted mb-1">Quick templates:</label>
+        <div class="d-flex flex-wrap gap-1">
+          <button *ngFor="let t of templates" class="btn btn-xs btn-outline-secondary" style="font-size:.68rem;padding:2px 8px" (click)="useTemplate(t)">{{t.name}}</button>
+        </div>
+      </div>
+      <div class="mb-2"><label class="small fw-bold">Name *</label><input class="form-control form-control-sm" [(ngModel)]="form.name" placeholder="e.g. SonarQube Production"></div>
+      <div class="mb-2"><label class="small fw-bold">Report Type *</label><select class="form-select form-select-sm" [(ngModel)]="form.report_type"><option value="">Select...</option><option *ngFor="let r of reportTypes" [value]="r">{{r}}</option></select></div>
+      <div class="mb-2"><label class="small">Tool Name</label><input class="form-control form-control-sm" [(ngModel)]="form.tool" placeholder="SonarQube, QRadar, Snyk..."></div>
+      <div class="mb-2"><label class="small fw-bold">API Endpoint URL *</label><input class="form-control form-control-sm" [(ngModel)]="form.endpoint_url" placeholder="https://..."></div>
+      <div class="mb-2"><label class="small fw-bold">Auth Type</label><select class="form-select form-select-sm" [(ngModel)]="form.auth_type"><option value="api_key">API Key</option><option value="bearer">Bearer Token</option><option value="basic">Basic Auth</option></select></div>
+      <div class="mb-2" *ngIf="form.auth_type==='api_key'"><label class="small">API Key</label><input class="form-control form-control-sm" type="password" [(ngModel)]="form.credentials.api_key" placeholder="Enter API key..."></div>
+      <div class="mb-2" *ngIf="form.auth_type==='bearer'"><label class="small">Bearer Token</label><input class="form-control form-control-sm" type="password" [(ngModel)]="form.credentials.token"></div>
+      <div class="mb-2"><label class="small fw-bold">Poll Interval</label><select class="form-select form-select-sm" [(ngModel)]="form.poll_interval"><option value="hourly">Hourly</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="manual">Manual Only</option></select></div>
+      <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" [(ngModel)]="form.enabled"><label class="form-check-label small">Enabled</label></div>
+      <div *ngIf="testResult?.success" class="alert alert-success py-2 small"><i class="fa fa-circle-check me-1"></i>Connection successful (HTTP {{testResult.status}})</div>
+      <div *ngIf="testResult&&!testResult.success" class="alert alert-danger py-2 small"><i class="fa fa-circle-xmark me-1"></i>{{testResult.error}}</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary btn-sm" (click)="test()" [disabled]="testLoading"><i class="fa fa-plug me-1"></i>Test Connection</button>
+        <button class="btn btn-primary btn-sm flex-fill" (click)="save()"><i class="fa fa-save me-1"></i>Save Integration</button>
+      </div>
+    </div>
+  </div>
+</div>

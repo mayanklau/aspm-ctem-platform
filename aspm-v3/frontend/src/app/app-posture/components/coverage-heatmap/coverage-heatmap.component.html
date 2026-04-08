@@ -1,0 +1,19 @@
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="fa fa-th-large mr-2"></i>Coverage Heatmap</span>
+    <span class="badge badge-primary">{{coveragePct | number:'1.0-0'}}% Coverage</span>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm heatmap-table mb-0">
+      <thead class="thead-light"><tr><th>Report Type</th><th>Weight</th><th>Status</th><th>Score</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let row of heatmap" class="hm-row" (click)="rowClick.emit(row)">
+          <td>{{row.label}}</td>
+          <td class="text-muted small">{{row.weight}}</td>
+          <td><span class="badge" [ngClass]="row.assessed ? 'badge-success' : 'badge-secondary'">{{row.assessed ? 'Assessed' : 'Not Assessed'}}</span></td>
+          <td><span [ngClass]="cellClass(row)">{{row.norm_score !== null ? (row.norm_score | number:'1.1-1') : '—'}}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

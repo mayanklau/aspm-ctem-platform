@@ -1,0 +1,39 @@
+<div class="row g-3" *ngIf="!loading">
+  <div class="col-md-4">
+    <div class="card p-3 text-center clickable" (click)="go('/app-posture')">
+      <div class="small text-muted text-uppercase fw-bold mb-1"><i class="fa fa-shield-halved me-1"></i>Bank Posture Score</div>
+      <div class="display-5 fw-bold" [ngStyle]="{'color':scoreColor(enterprise?.bank_score)}">{{enterprise?.bank_score | number:'1.1-1'}}</div>
+      <div class="text-muted small">/ 10</div>
+      <span class="badge mt-1" [ngStyle]="{'background': scoreColor(enterprise?.bank_score),'color':'#fff'}">
+        {{enterprise?.bank_score<=4?'High Risk':enterprise?.bank_score<=7?'Medium Risk':'Low Risk'}}
+      </span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 clickable" (click)="go('/app-posture')">
+      <div class="small text-muted text-uppercase fw-bold mb-2"><i class="fa fa-th me-1"></i>Business Unit Posture</div>
+      <div class="row g-1">
+        <div class="col-4" *ngFor="let bu of enterprise?.business_units?.slice(0,6)">
+          <div class="rounded p-1 text-center small" [ngStyle]="{'background':buCellBg(bu.score)}">
+            <div class="fw-bold" [ngStyle]="{'color':scoreColor(bu.score)}">{{bu.score | number:'1.0-0'}}</div>
+            <div class="text-truncate" style="font-size:.62rem;color:#555" [title]="bu.name">{{bu.name}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 clickable" (click)="go('/app-posture')">
+      <div class="small text-muted text-uppercase fw-bold mb-2"><i class="fa fa-exclamation-triangle me-1"></i>Top 5 Riskiest Apps</div>
+      <div *ngFor="let app of topRisky; let i=index" class="d-flex align-items-center mb-1">
+        <span class="text-muted me-2 small">{{i+1}}</span>
+        <div class="flex-fill small text-truncate" [title]="app.app_name">{{app.app_name}}</div>
+        <span class="badge" [ngStyle]="{'background':scoreColor(app.final_posture_score),'color':'#fff'}">{{app.final_posture_score | number:'1.1-1'}}</span>
+      </div>
+      <div *ngIf="!topRisky.length" class="text-muted small text-center py-2">No data yet</div>
+    </div>
+  </div>
+</div>
+<div *ngIf="loading" class="row g-3">
+  <div class="col-md-4" *ngFor="let i of [1,2,3]"><div class="skeleton" style="height:100px"></div></div>
+</div>

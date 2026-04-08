@@ -1,0 +1,7 @@
+app_id,app_name,tool,scan_date,package,version,cve,cvssScore,Severity,title,description,fixedIn,status
+APP-001,Internet Banking Portal,snyk,2025-03-15,log4j-core,2.14.1,CVE-2021-44228,10.0,Critical,Log4Shell - Remote Code Execution,"Apache Log4j2 JNDI features used in configuration, log messages, and parameters do not protect against attacker controlled LDAP servers.",2.15.0,open
+APP-001,Internet Banking Portal,snyk,2025-03-15,spring-core,5.3.18,CVE-2022-22965,9.8,Critical,Spring4Shell - Remote Code Execution,A Spring MVC or Spring WebFlux application running on JDK 9+ may be vulnerable to remote code execution (RCE).,5.3.19,open
+APP-001,Internet Banking Portal,snyk,2025-03-15,jackson-databind,2.12.5,CVE-2022-42003,7.5,High,Jackson Databind Deserialization,FasterXML jackson-databind vulnerable to denial of service via deeply nested arrays.,2.13.4,open
+APP-002,Mobile Banking App,snyk,2025-03-18,okhttp,3.12.0,CVE-2021-0341,7.5,High,OkHttp TLS Verification Bypass,OkHttp verifyHostname does not verify the hostname in some conditions.,4.9.1,open
+APP-002,Mobile Banking App,owasp_dependency_check,2025-03-18,gson,2.8.5,CVE-2022-25647,7.5,High,Gson Deserialization,Gson deserialization vulnerability could lead to RCE.,2.8.9,in_progress
+APP-003,Core Banking System,black_duck,2025-03-20,commons-text,1.9,CVE-2022-42889,9.8,Critical,Apache Commons Text4Shell,Apache Commons Text performs variable interpolation allowing RCE.,1.10.0,open

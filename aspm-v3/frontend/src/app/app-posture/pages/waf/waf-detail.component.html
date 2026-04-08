@@ -1,0 +1,90 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <a routerLink="/app-posture" class="btn btn-sm btn-outline-secondary me-2"><i class="fa fa-arrow-left"></i></a>
+      <span class="page-title">WAF Configuration</span>
+      <div class="text-muted small">Web Application Firewall rule gaps</div>
+    </div>
+    <span class="badge bg-secondary">{{total}} findings</span>
+  </div>
+
+  <!-- Summary pills -->
+  <div class="d-flex gap-2 mb-3 flex-wrap">
+    <span *ngFor="let sev of severities" class="badge" [ngClass]="sevClass(sev)">
+      {{sev | titlecase}}: {{totalFor(sev)}}
+    </span>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-3"><div class="card-body py-2">
+    <div class="row g-2">
+      <div class="col-md-2"><input class="form-control form-control-sm" [(ngModel)]="filters.appId" placeholder="App ID..." (keyup.enter)="apply()"></div>
+      <div class="col-md-2">
+        <select class="form-select form-select-sm" [(ngModel)]="filters.severity" (change)="apply()">
+          <option value="">All Severity</option>
+          <option *ngFor="let s of severities" [value]="s">{{s | titlecase}}</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select form-select-sm" [(ngModel)]="filters.status" (change)="apply()">
+          <option value="">All Status</option>
+          <option *ngFor="let s of statuses" [value]="s">{{s | titlecase}}</option>
+        </select>
+      </div>
+      <div class="col-md-3"><input class="form-control form-control-sm" [(ngModel)]="filters.q" placeholder="Search..." (keyup.enter)="apply()"></div>
+      <div class="col-md-3">
+        <button class="btn btn-sm btn-primary me-1" (click)="apply()">Filter</button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="clear()">Clear</button>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- Table -->
+  <div class="card"><div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-dark"><tr>
+          <th>Title</th><th>App</th><th>Severity</th><th>Status</th><th>Date</th><th></th>
+        </tr></thead>
+        <tbody>
+          <tr *ngIf="loading"><td colspan="6" class="text-center py-4"><div class="spinner-border spinner-border-sm me-2"></div>Loading...</td></tr>
+          <tr *ngFor="let f of findings" class="clickable" (click)="open(f)"
+              [class.table-danger]="f.severity==='critical'" [class.table-warning]="f.severity==='high'">
+            <td style="max-width:300px"><div class="text-truncate" [title]="f.title||f.finding_title||f.observation_title||f.sig_name">{{f.title||f.finding_title||f.observation_title||f.sig_name||'—'}}</div></td>
+            <td class="small text-muted">{{f.app_id||f.asset_id||'—'}}</td>
+            <td><span class="badge" [ngClass]="sevClass(f.severity)">{{f.severity}}</span></td>
+            <td><select class="form-select form-select-sm" style="width:120px" [(ngModel)]="f.status" (change)="updateStatus(f.id, f.status)" (click)="$event.stopPropagation()">
+              <option *ngFor="let s of statuses" [value]="s">{{s}}</option>
+            </select></td>
+            <td class="small text-muted">{{(f.scan_date||f.audit_date||f.created_at||'') | date:'dd MMM yy'}}</td>
+            <td><i class="fa fa-chevron-right text-muted"></i></td>
+          </tr>
+          <tr *ngIf="!loading && !findings.length"><td colspan="6" class="text-center text-muted py-4">No findings. Upload a WAF report to get started.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center align-items-center gap-2 p-2" *ngIf="pages > 1">
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="page<=1" (click)="changePage(page-1)">‹</button>
+      <span class="small">Page {{page}} of {{pages}}</span>
+      <button class="btn btn-sm btn-outline-secondary" [disabled]="page>=pages" (click)="changePage(page+1)">›</button>
+    </div>
+  </div></div>
+
+  <!-- Side panel -->
+  <div class="side-panel-overlay" *ngIf="showPanel" (click)="close()"></div>
+  <div class="side-panel" *ngIf="showPanel">
+    <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+      <h6 class="mb-0">Finding Detail</h6>
+      <button class="btn btn-sm btn-outline-secondary" (click)="close()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="p-3" *ngIf="selected">
+      <div *ngFor="let k of objectKeys(selected)">
+        <div *ngIf="selected[k] && k !== 'raw_data' && k !== 'id'" class="mb-2">
+          <div class="field-label">{{k}}</div>
+          <div class="field-value">{{selected[k]}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

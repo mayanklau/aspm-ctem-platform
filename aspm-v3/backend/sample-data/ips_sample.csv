@@ -1,0 +1,7 @@
+sig_id,sig_name,category,Severity,action,enabled,protocol,cve,description,policy_name
+SID-1001,ET EXPLOIT Apache Log4j RCE Attempt,Exploit,Critical,block,true,TCP,CVE-2021-44228,Detects Log4Shell exploitation attempts,Production-IPS-Policy
+SID-1002,ET EXPLOIT Spring4Shell RCE Attempt,Exploit,Critical,block,true,TCP,CVE-2022-22965,Detects Spring4Shell exploitation,Production-IPS-Policy
+SID-1003,GPL SCAN nmap SYN Scan,Reconnaissance,Medium,alert,true,TCP,,Detects nmap SYN scans,Production-IPS-Policy
+SID-1004,ET TROJAN Cobalt Strike Beacon Detected,Malware,Critical,block,false,TCP,,Detects Cobalt Strike C2 beacons,Production-IPS-Policy
+SID-1005,ET SQL Injection Attempt,Web Application,High,alert,true,TCP,,SQL injection pattern detection,Production-IPS-Policy
+SID-1006,ET WEB_SERVER PHP Webshell Activity,Web Application,High,block,true,TCP,,PHP webshell upload/execution,Production-IPS-Policy

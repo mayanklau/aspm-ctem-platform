@@ -1,0 +1,5 @@
+RULENUM,SOURCE,DESTINATION,ACTION,TIME,ENABLE,NAME,SERVICES_APPLICATIONS,TRACK,INSTALL,COMMENTS,VPN,SECTION_HEADER,LAYER NAME,LAYER TYPE
+1,Any,DMZ_Network,Accept,Any,true,Allow-External-to-DMZ,"HTTP, HTTPS",Log,Policy Targets,Allow web traffic to DMZ,,Inbound Rules,Network Layer,ordered-layer
+2,DMZ_Network,Internal_Servers,Accept,Any,true,DMZ-to-Internal,Any,Log,Policy Targets,,,,Network Layer,ordered-layer
+3,Any,Any,Accept,Any,true,Cleanup-Accept-All,Any,None,Policy Targets,,,Catchall,Network Layer,ordered-layer
+4,Internal_Users,Internet,Accept,Business_Hours,true,Internet-Access,"HTTPS, HTTP, DNS",Log,Policy Targets,Business hours internet,,Outbound,Network Layer,ordered-layer

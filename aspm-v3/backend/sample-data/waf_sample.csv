@@ -1,0 +1,7 @@
+app_id,app_name,rule_id,rule_name,rule_type,action,enabled,exceptions,whitelist,Severity
+APP-001,Internet Banking Portal,RUL-001,Block SQL Injection,Signature,block,true,,,High
+APP-001,Internet Banking Portal,RUL-002,Block XSS,Signature,block,true,"192.168.1.10, 192.168.1.11",,Medium
+APP-001,Internet Banking Portal,RUL-003,Rate Limit API,Rate Limiting,block,true,,10.0.0.0/8,Medium
+APP-001,Internet Banking Portal,RUL-004,Block Scanner User-Agents,Blacklist,alert,false,,,Low
+APP-004,Payment Gateway,RUL-005,PCI DSS XSS Protection,Signature,block,true,,,High
+APP-004,Payment Gateway,RUL-006,Block Command Injection,Signature,block,true,,,Critical
